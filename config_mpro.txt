@@ -1,0 +1,14 @@
+folder: mpro_peptidomimetics
+mode: start
+pdbID: mpro_tripeptide
+peptidomimetic: DGN-DME-ORN
+chain: B
+trials: 20000
+scoring: consensus
+score_list: vina,cyscore,rosetta,nnscore,internal,bpsscore
+threshold: 4
+teffective: 4
+num_mutations: 200
+residues_mod: 1,2,3
+source: ./input
+rosetta_version: rosetta_bin_linux_2016.32.58837_bundle

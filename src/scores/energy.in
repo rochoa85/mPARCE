@@ -1,0 +1,12 @@
+!==============================================
+! I/O Parameters
+!==============================================
+data_directory           PATH/data
+infile_pdb               RECEPTOR.pdb
+infile_ligand            LIGAND.mol2
+top_type                 polarh
+!==============================================
+! Energy Parameters
+!==============================================
+weight_type              BP2score
+!==============================================
