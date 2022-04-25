@@ -6,13 +6,20 @@
 * Journal of Chemical Information and Modelling, 2021
 * Authors: Rodrigo Ochoa, XXX, Pilar Cossio
 
+## mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
+
+* From publication: Protocol for iterative optimization of modified peptides bound to protein targets
+* Journal of Chemical Information and Modelling, 2022
+* Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
+
+
 ## Purpose
 
-Here we present PARCEmime, an open source protocol to design peptidomimetics with improved binding affinity to a target of reference. The protocol generates single point mutations on the peptidomimetic sequence based on a list of parameterized non-natural amino acids (NNAAs). Then, it estimates their binding affinities in complex with the protein in an efficient but accurate manner by combining backrub sampling from Rosetta with a consensus metric using multiple protein-ligand scoring functions.
+Here we present mPARCE, an open source protocol to design modified peptides with improved binding affinity to a target of reference. The protocol generates single point mutations on the peptidomimetic sequence based on a list of parameterized non-natural amino acids (NNAAs). Then, it estimates their binding affinities in complex with the protein in an efficient but accurate manner by combining backrub sampling from Rosetta with a consensus metric using multiple protein-ligand scoring functions.
 
 ## Required third-party tools:
 
-- Rosetta (tested with 2016 version): https://www.rosettacommons.org/software/license-and-download
+- Rosetta (tested with 2022 version): https://www.rosettacommons.org/software/license-and-download
 
 **NOTE: The name of the local Rosetta folder must be provided in the configuration file. Rosetta is required to do the mutation and complex sampling.**
 

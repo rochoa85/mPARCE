@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
 """
-PARCEmime: Protocol for refinement of bound peptidomimetics
+mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
 
-From publication: Protocol for iterative design of peptidomimetics bound to protein targets
-Journal of Chemical Information and Modelling, 2021
-Authors: Rodrigo Ochoa, XXX, Pilar Cossio
+From publication: Protocol for iterative optimization of modified peptides bound to protein targets
+Journal of Chemical Information and Modelling, 2022
+Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 
 Third-party tools required:
 
@@ -19,7 +19,7 @@ Third-party tools required:
 ########################################################################################
 
 __author__ = "Rodrigo Ochoa"
-__credits__ = ["Rodrigo Ochoa", "XXX", "Pilar Cossio"]
+__credits__ = ["Rodrigo Ochoa", "Pilar Cossio", "Thomas Fox"]
 __license__ = "MIT"
 __version__ = "1.0"
 __email__ = "rodrigo.ochoa@udea.edu.co"
@@ -168,7 +168,7 @@ class score_protein_protein:
         Output:
         dsxscore_score -- Score predicted by DSXscore
         """
-	path_target=self.path+"/"+self.pdbID
+        path_target=self.path+"/"+self.pdbID
         os.system("python {}/get_chains.py {}.pdb {}".format(self.path_scores,path_target,self.path))
         # Create dynamically the target with the corresponding chains
         if len(self.chain_target) > 1:
@@ -181,8 +181,7 @@ class score_protein_protein:
 
         os.system("obabel -ipdb {}_{}.pdb -omol2 > {}_{}.mol2".format(path_target,self.chain_binder,path_target,self.chain_binder))
         os.system("cp {}/amino.mol2 .".format(self.path_scores))
-        os.system("./{}/dligand2.intel -L {}_{}.mol2 -P {}_target.pdb -s {}/dfire.2 > {}/score.log".format(self.path_scores,path_target,self.chain_binder,path_target,self.path_scores,self.pa
-th))
+        os.system("./{}/dligand2.intel -L {}_{}.mol2 -P {}_target.pdb -s {}/dfire.2 > {}/score.log".format(self.path_scores,path_target,self.chain_binder,path_target,self.path_scores,self.path))
 
         # Filter the DSXscore file result
         bash="head -n1 {}/score.log | tail -n1".format(self.path)

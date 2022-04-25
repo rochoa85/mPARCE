@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
 """
-PARCEmime: Protocol for refinement of bound peptidomimetics
+mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
 
-From publication: Protocol for iterative design of peptidomimetics bound to protein targets
-Journal of Chemical Information and Modelling, 2021
-Authors: Rodrigo Ochoa, XXX, Pilar Cossio
+From publication: Protocol for iterative optimization of modified peptides bound to protein targets
+Journal of Chemical Information and Modelling, 2022
+Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 
 Third-party tools required:
 
@@ -19,7 +19,7 @@ Third-party tools required:
 ########################################################################################
 
 __author__ = "Rodrigo Ochoa"
-__credits__ = ["Rodrigo Ochoa","XXX", "Pilar Cossio"]
+__credits__ = ["Rodrigo Ochoa", "Pilar Cossio", "Thomas Fox"]
 __license__ = "MIT"
 __version__ = "1.0"
 __email__ = "rodrigo.ochoa@udea.edu.co"
@@ -42,7 +42,7 @@ import os
 if __name__ == '__main__':
 
     # Script arguments
-    parser = argparse.ArgumentParser(description='PARCEmime: Protocol for refinement of bound peptidomimetics')
+    parser = argparse.ArgumentParser(description='mPARCE: Protocol for refinement of bound modified peptides')
     parser.add_argument('-c', dest='config_file', type=argparse.FileType(mode='r'), required=True,
                         help='File containing all the necessary parameters to run the protocol')
 
@@ -80,10 +80,10 @@ if __name__ == '__main__':
     else:
         print("The parameter 'pdbID' is required for the analysis. Exiting ...")
         exit()
-    if args.peptidomimetic:
-        peptidomimetic=args.peptidomimetic
+    if args.peptide:
+        peptide=args.peptide
     else:
-        print("The parameter 'peptidomimetic' is required for the analysis. Exiting ...")
+        print("The parameter 'peptide' is required for the analysis. Exiting ...")
         exit()
     if args.chain:
         chain=args.chain
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     for key in protein_complex.score_dictionary:
         score_sentence=score_sentence+key+":"+str(protein_complex.score_dictionary[key])+" "
         score_dictionary_total[0][key]=float(protein_complex.score_dictionary[key])
-    mutation_document.write("Iteration_{}: Original - Accepted Scores: {} Sequence:{}\n".format(iteration,score_sentence,peptidomimetic))
+    mutation_document.write("Iteration_{}: Original - Accepted Scores: {} Sequence:{}\n".format(iteration,score_sentence,peptide))
 
     # Start the mutation of random amino acids
-    protein_complex.mutation_random(residues_mod,mutation_document,score_dictionary_total,peptidomimetic,score_list)
+    protein_complex.mutation_random(residues_mod,mutation_document,score_dictionary_total,peptide,score_list)

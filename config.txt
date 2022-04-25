@@ -1,0 +1,14 @@
+folder: granzymeH
+mode: start
+pdbID: granzymeH
+peptide: PRO-THR-SER-TYR-ALA-GLY-ASP-ASP-SER 
+chain: B
+trials: 20000
+scoring: consensus
+score_list: vina,dsxscore,rosetta,nnscore,internal,cyscore
+threshold: 4
+teffective: 4
+num_mutations: 200
+residues_mod: 2,4,6,8
+source: ./input
+rosetta_version: /home/ochoadeo/Downloads/rosetta.binary.linux.release-296

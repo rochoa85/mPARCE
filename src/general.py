@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
 """
-PARCEmime: Protocol for refinement of bound peptidomimetics
+mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
 
-From publication: Protocol for iterative design of peptidomimetics bound to protein targets
-Journal of Chemical Information and Modelling, 2021
-Authors: Rodrigo Ochoa, XXX, Pilar Cossio
+From publication: Protocol for iterative optimization of modified peptides bound to protein targets
+Journal of Chemical Information and Modelling, 2022
+Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 
 Third-party tools required:
 
@@ -19,7 +19,7 @@ Third-party tools required:
 ########################################################################################
 
 __author__ = "Rodrigo Ochoa"
-__credits__ = ["Rodrigo Ochoa","XXX", "Pilar Cossio"]
+__credits__ = ["Rodrigo Ochoa", "Pilar Cossio", "Thomas Fox"]
 __license__ = "MIT"
 __version__ = "1.0"
 __email__ = "rodrigo.ochoa@udea.edu.co"
@@ -81,7 +81,7 @@ class complex:
         self.mode=mode
         self.trials=trials
         self.num_mutations=num_mutations
-        self.rosetta_version=rosetta_version
+        self.rosetta_path=rosetta_version
         self.consensus_threshold=threshold
         self.scoring_s=scoring_s
         self.t_effective=t_effective
@@ -163,8 +163,8 @@ class complex:
         """
 
         # Get rosetta path
-        bash = "locate -b {} | head -n1".format(self.rosetta_version)
-        self.rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
+        #bash = "locate -b {} | head -n1".format(self.rosetta_version)
+        #self.rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
 
         if initial:
             # Run the sampling
@@ -313,13 +313,13 @@ class complex:
     ########################################################################################
     def mutation_random(self,residues_mod,mutation_document,score_dictionary_total,mime_sequence,score_list):
         """
-        Function to mutate any amino acid of the peptidomimetic randomly
+        Function to mutate any amino acid of the peptide randomly
 
         Arguments:
-        residues_mod -- list of positions of the peptidomimetic sequence that can be mutated
+        residues_mod -- list of positions of the peptide sequence that can be mutated
         mutation_document -- text file with the report of the scores and the mutations
         score_dictionary -- general dictionary where the scores are stored per iteration
-        mime_sequence -- sequence of the peptidomimetic
+        mime_sequence -- sequence of the peptide
         score_list -- list of scoring functions that will be used to select the mutations
 
         Output:
@@ -333,7 +333,7 @@ class complex:
 
         # Check which amino acids should mutate
         self.number_aa_used=len(residues_mod)
-        self.aa_list=[x.strip() for x in open("src/list_nnaa.txt")]
+        self.aa_list=[x.strip() for x in open("src/available_AA.txt")]
         self.total_aa_used=len(self.aa_list)
 
         # Define the initial settings of the reference peptide
@@ -374,22 +374,32 @@ class complex:
             resfile.write("{} {} NC {}".format(position,self.binder,new_aa))
             resfile.close()
 
+            resfile=open("{}/ncaa_resfile".format(self.path),"w")
+            resfile.write('NATRO\n')
+            resfile.write('start\n')
+            resfile.write('{} {} PIKAA X[{}]'.format(position,self.binder,new_aa))
+            resfile.close()
+
+            ncaa = open("{}/list_ncaa".format(self.path),"w")
+            ncaa.write('{}'.format(new_aa))
+            ncaa.close()
+
             os.system("cp {}/complexP/complex_{}.pdb {}".format(self.path,last_good_iteration,self.path))
 
             # Get rosetta path
-            bash = "locate -b {} | head -n1".format(self.rosetta_version)
-            rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
+            #bash = "locate -b {} | head -n1".format(self.rosetta_version)
+            #rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
 
             # Do the mutation
             os.system("{}/main/source/bin/fixbb.linuxgccrelease -s {}/complex_{}.pdb \
-                      -use_input_sc -nstruct 1 -ex1 -ex2 -extrachi_cutoff 0 -overwrite \
-                      -minimize_sidechains -resfile {}/ncaa_resfile \
-                      -out:path:all {}".format(rosetta_path,self.path,last_good_iteration,self.path,self.path))
+                      -use_input_sc -nstruct 1 -ex1 -ex2 -extrachi_cutoff 0 -overwrite -extra_res_fa src/params/{}.params \
+                      -minimize_sidechains -resfile {}/ncaa_resfile -packer_palette:extra_base_type_file {}/list_ncaa \
+                      -out:path:all {}".format(self.rosetta_path,self.path,last_good_iteration,new_aa,self.path,self.path,self.path))
 
             # Relax the generated structure
             os.system("{}/main/source/bin/relax.linuxgccrelease -database {}/main/database \
                       -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {} \
-                      -relax:bb_move false".format(rosetta_path,rosetta_path,self.path,last_good_iteration,self.path))
+                      -relax:bb_move false".format(self.rosetta_path,self.rosetta_path,self.path,last_good_iteration,self.path))
 
             os.system("csplit {}/complex_{}_0001_0001.pdb /All/".format(self.path,last_good_iteration))
             os.system("mv xx00 {}/mutated.pdb".format(self.path,self.path))
@@ -399,7 +409,7 @@ class complex:
             self.iteration+=1
 
             # Configure the new system
-            mutated_system=complex(self.binder,"mutated",self.iteration,self.num_mutations,self.rosetta_version,self.scoring_s,self.consensus_threshold,self.t_effective,self.trials,self.mode)
+            mutated_system=complex(self.binder,"mutated",self.iteration,self.num_mutations,self.rosetta_path,self.scoring_s,self.consensus_threshold,self.t_effective,self.trials,self.mode)
             mutated_system.setup(self.folder_path)
             mutated_system.run_sampling(initial=False)
             mutated_system.get_molecules_after_sampling()
