@@ -185,9 +185,12 @@ class score_protein_protein:
 
         # Filter the DSXscore file result
         bash="head -n1 {}/score.log | tail -n1".format(self.path)
-        output = subprocess.check_output(['bash','-c', bash])
-        os.system("rm {}/score.log {}/*.mol2 {}_*.pdb {}/chains.seq".format(self.path,self.path,path_target,self.path))
-        self.dsxscore_score="%0.3f" %float(output)
+        output = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
+        os.system("rm {}/score.log {}/*.mol2 {}_*.pdb {}/chains.seq amino.mol2".format(self.path,self.path,path_target,self.path))
+        if str(output)=='nan':
+            self.dsxscore_score=0.0
+        else:
+            self.dsxscore_score="%0.3f" %float(output)
 
         #path_target=self.path+"/"+self.pdbID
         #os.system("python {}/get_chains.py {}.pdb {}".format(self.path_scores,path_target,self.path))

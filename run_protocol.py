@@ -51,7 +51,7 @@ if __name__ == '__main__':
     #####################################################################################
     args = parser.parse_args()
     if args.config_file:
-        data = yaml.load(args.config_file)
+        data = yaml.safe_load(args.config_file)
         delattr(args, 'config_file')
         arg_dict = args.__dict__
         for key, value in data.items():
@@ -122,7 +122,7 @@ if __name__ == '__main__':
                 print("For consensus scoring minimum two scoring functions should be selected. Exiting ...")
                 exit()
             for s in score_list:
-                if s not in ("vina","smina","rosetta","nnscore","internal","dsxscore","flex","cyscore","bpsscore"):
+                if s not in ("vina","smina","rosetta","nnscore","internal","dligand2","flex","cyscore","bpsscore"):
                     print("The scoring function {} is not available. Exiting ...".format(s))
                     exit()
     else:
@@ -158,6 +158,15 @@ if __name__ == '__main__':
         print("The parameter 'rosetta_version' is required for the analysis. Exiting ...")
         exit()
 
+    try:
+        if args.categories:
+            if "," in args.categories:
+                categories=args.categories.split(',')
+            else:
+                categories=[args.categories]
+    except:
+        categories = ['ALL']
+
     ####################################################################################
     # Starting the design
     ####################################################################################
@@ -178,7 +187,7 @@ if __name__ == '__main__':
 
     # Score the first run
     print("Scoring the system ...")
-    protein_complex.score_complex(score_list)
+    protein_complex.score_complex(score_list, initial=True)
     print(protein_complex.score_dictionary)
 
     # Write the scores in the report document
@@ -192,4 +201,4 @@ if __name__ == '__main__':
     mutation_document.write("Iteration_{}: Original - Accepted Scores: {} Sequence:{}\n".format(iteration,score_sentence,peptide))
 
     # Start the mutation of random amino acids
-    protein_complex.mutation_random(residues_mod,mutation_document,score_dictionary_total,peptide,score_list)
+    protein_complex.mutation_random(residues_mod,mutation_document,score_dictionary_total,peptide,score_list,categories)

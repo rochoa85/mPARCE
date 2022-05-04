@@ -85,6 +85,7 @@ class complex:
         self.consensus_threshold=threshold
         self.scoring_s=scoring_s
         self.t_effective=t_effective
+        self.flag_sampling=1
 
 
     ########################################################################################
@@ -168,30 +169,41 @@ class complex:
 
         if initial:
             # Run the sampling
-            os.system("{}/main/source/bin/backrub.linuxgccrelease -database {}/main/database \
+            os.system("{}/main/source/bin/backrub.static.linuxgccrelease -database {}/main/database \
                       -s {}/{}.pdb -ex1 -ex2 -extrachi_cutoff 0 -backrub:ntrials {} -mc_kt 1.2 -ignore_zero_occupancy=false \
                       -initial_pack -trajectory=true".format(self.rosetta_path,self.rosetta_path,self.path,self.pdbID,self.trials))
             bash= "grep Score: {}_0001_traj.pdb | awk '{{print $NF}}' | sort -g | head -n 1".format(self.pdbID)
             self.score_current=subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
 
             # Store files
-            os.system("mv {}_0001_low.pdb {}/complex_{}.pdb".format(self.pdbID,self.path,self.iteration))
+            os.system("mv {}_0001_last.pdb {}/complex_{}.pdb".format(self.pdbID,self.path,self.iteration))
             os.system("mv {}_0001_traj.pdb {}/trajectory/trajectory_{}.pdb".format(self.pdbID,self.path,self.iteration))
-            os.system("rm {}_* score.sc".format(self.pdbID))
+            os.system("rm {}_* score.sc ROSETTA_CRASH.log".format(self.pdbID))
 
 
         else:
             # Run the sampling
-            os.system("{}/main/source/bin/backrub.linuxgccrelease -database {}/main/database \
-                      -s {}/mutated.pdb -ex1 -ex2 -extrachi_cutoff 0 -backrub:ntrials {} -mc_kt 1.2 -ignore_zero_occupancy=false \
-                      -initial_pack -trajectory=true".format(self.rosetta_path,self.rosetta_path,self.path,self.trials))
-            bash= "grep Score: mutated_0001_traj.pdb | awk '{print $NF}' | sort -g | head -n 1"
-            self.score_current=subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
+            #os.system("{}/main/source/bin/backrub.static.linuxgccrelease -database {}/main/database \
+            #              -s {}/mutated.pdb -ex1 -ex2 -extrachi_cutoff 0 -backrub:ntrials {} -mc_kt 1.2 -ignore_zero_occupancy=false \
+            #              -initial_pack -trajectory=true".format(self.rosetta_path,self.rosetta_path,self.path,self.trials))
+            #if os.path.isfile('ROSETTA_CRASH.log'):
+            os.system("cp {}/mutated.pdb mutated_0001_last.pdb".format(self.path))
+            #os.system("sed -i '1s#^#MODEL\n#' {}/mutated.pdb".format(self.path))
+            os.system("echo 'MODEL' | cat - {}/mutated.pdb > temp && mv temp mutated_0001_traj.pdb".format(self.path))
+            os.system("echo 'ENDMDL' >> mutated_0001_traj.pdb")
+            #os.system("cp {}/mutated.pdb mutated_0001_traj.pdb".format(self.path))
+            bash = "grep pose mutated_0001_traj.pdb | awk '{print $NF}'"
+            self.score_current = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
+            self.flag_sampling = 0
+            #else:
+            #    bash = "grep Score: mutated_0001_traj.pdb | awk '{print $NF}' | sort -g | head -n 1"
+            #    self.score_current = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
+            #    self.flag_sampling = 1
 
             # Store files
-            os.system("mv mutated_0001_low.pdb {}/complex_{}.pdb".format(self.path,self.iteration))
+            os.system("mv mutated_0001_last.pdb {}/complex_{}.pdb".format(self.path,self.iteration))
             os.system("mv mutated_0001_traj.pdb {}/trajectory/trajectory_{}.pdb".format(self.path,self.iteration))
-            os.system("rm mutated_* score.sc")
+            os.system("rm mutated_* score.sc ROSETTA_CRASH.log")
 
     ########################################################################################
     def get_molecules_after_sampling(self):
@@ -220,7 +232,7 @@ class complex:
         os.system("rm {}_* {}/chains.seq".format(path_target,self.path))
 
     ########################################################################################
-    def score_complex(self,score_list):
+    def score_complex(self,score_list,initial=False):
         """
         Function to score each snapshot of the trajectory for the scoring functions selected
 
@@ -243,13 +255,16 @@ class complex:
         total_score={}
         for sc in score_list: total_score[sc]=[]
 
-        # Iterate over all the MD frames
+        # Iterate over all the frames
         for line in PDB_traj:
             if line == "ENDMDL":
                 # Model ID
                 p="model"+str(model_number)
-                ref_value=int(self.trials)/200
-                if model_number > ref_value:
+                if initial:
+                    ref_value=int(self.trials)/100
+                else:
+                    ref_value=1
+                if model_number == ref_value:
                     # Save file with file number in name
                     output_file = open(self.path+"/model" + str(model_number) + ".pdb", "w")
                     output_file.write(new_file_text.rstrip('\r\n')) #rstrip to remove trailing newline
@@ -265,8 +280,14 @@ class complex:
                     os.system("sed -i 's/OC1/O  /g' "+self.path+"/model" + str(model_number) + ".pdb")
                     os.system("sed -i 's/OC2/OXT/g' "+self.path+"/model" + str(model_number) + ".pdb")
 
-                    bash="grep Score "+self.path+"/model" + str(model_number) + ".pdb | awk '{print $NF}'"
-                    ros_score = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
+                    # if initial:
+                    #     bash="grep Score "+self.path+"/model" + str(model_number) + ".pdb | awk '{print $NF}'"
+                    #     ros_score = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
+                    # else:
+                    #     bash = "grep pose " + self.path + "/model" + str(model_number) + ".pdb | awk '{print $NF}'"
+                    #     ros_score = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
+
+                    ros_score=self.score_current
 
                     # Function to score
                     sc=scoring.score_protein_protein(p,self.path,self.chain_join,self.binder,self.rosetta_path)
@@ -276,29 +297,53 @@ class complex:
                         if s=="internal":
                             total_score[s].append(float(ros_score))
                         if s=="rosetta":
-                            sc.computeRosetta()
-                            total_score[s].append(float(sc.rosetta_score))
+                            try:
+                                sc.computeRosetta()
+                                total_score[s].append(float(sc.rosetta_score))
+                            except:
+                                total_score[s].append(0.0)
                         if s=="flex":
-                            sc.computeFlex()
-                            total_score[s].append(float(sc.flex_score))
+                            try:
+                                sc.computeFlex()
+                                total_score[s].append(float(sc.flex_score))
+                            except:
+                                total_score[s].append(0.0)
                         if s=="vina":
-                            sc.computeVina()
-                            total_score[s].append(float(sc.vina_score))
+                            try:
+                                sc.computeVina()
+                                total_score[s].append(float(sc.vina_score))
+                            except:
+                                total_score[s].append(0.0)
                         if s=="smina":
-                            sc.computeSmina()
-                            total_score[s].append(float(sc.smina_score))
+                            try:
+                                sc.computeSmina()
+                                total_score[s].append(float(sc.smina_score))
+                            except:
+                                total_score[s].append(0.0)
                         if s=="nnscore":
-                            sc.computeNNscore()
-                            total_score[s].append(float(sc.nnscore_score))
-                        if s=="dsxscore":
-                            sc.computeDSXscore()
-                            total_score[s].append(float(sc.dsxscore_score))
+                            try:
+                                sc.computeNNscore()
+                                total_score[s].append(float(sc.nnscore_score))
+                            except:
+                                total_score[s].append(0.0)
+                        if s=="dligand2":
+                            try:
+                                sc.computeDSXscore()
+                                total_score[s].append(float(sc.dsxscore_score))
+                            except:
+                                total_score[s].append(0.0)
                         if s=="cyscore":
-                            sc.computeCyscore()
-                            total_score[s].append(float(sc.cyscore_score))
+                            try:
+                                sc.computeCyscore()
+                                total_score[s].append(float(sc.cyscore_score))
+                            except:
+                                total_score[s].append(0.0)
                         if s=="bpsscore":
-                            sc.computeBPSscore()
-                            total_score[s].append(float(sc.bpsscore_score))
+                            try:
+                                sc.computeBPSscore()
+                                total_score[s].append(float(sc.bpsscore_score))
+                            except:
+                                total_score[s].append(0.0)
 
                 # reset everything for next model
                 model_number += 1
@@ -311,7 +356,7 @@ class complex:
         for s in score_list: self.score_dictionary[s]=mean(total_score[s])
 
     ########################################################################################
-    def mutation_random(self,residues_mod,mutation_document,score_dictionary_total,mime_sequence,score_list):
+    def mutation_random(self,residues_mod,mutation_document,score_dictionary_total,mime_sequence,score_list,categories):
         """
         Function to mutate any amino acid of the peptide randomly
 
@@ -333,7 +378,27 @@ class complex:
 
         # Check which amino acids should mutate
         self.number_aa_used=len(residues_mod)
-        self.aa_list=[x.strip() for x in open("src/available_AA.txt")]
+
+        if categories[0]=="ALL":
+            self.aa_list=[x.strip() for x in open("src/available_AA.txt")]
+        else:
+            cat_list=[x.strip() for x in open("src/categories_AA.txt")]
+            self.aa_list = []
+            for cat in cat_list:
+                info=cat.split()
+                name = info[0]
+                cat1 = info[2]
+                cat2 = info[3]
+                cat3 = info[4]
+                cat_groups=[cat1, cat2, cat3]
+                count_cat=0
+                for req_cat in categories:
+                    if req_cat in cat_groups:
+                        count_cat+=1
+                if count_cat==len(categories):
+                    self.aa_list.append(name)
+
+        self.internal_aa = [x.strip() for x in open("src/internal_AA.txt")]
         self.total_aa_used=len(self.aa_list)
 
         # Define the initial settings of the reference peptide
@@ -366,13 +431,13 @@ class complex:
             pep_single_mutation_2='-'.join(temporal_pep)
             print(pep_single_mutation_1,pep_single_mutation_2,old_aa,new_aa,position,self.binder)
 
-            # Rosetta file to do the mutation
-            resfile=open("{}/ncaa_resfile".format(self.path),"w")
-            resfile.write("NATRO\n")
-            resfile.write("start\n\n")
-            resfile.write("{} {} EMPTY\n".format(position,self.binder))
-            resfile.write("{} {} NC {}".format(position,self.binder,new_aa))
-            resfile.close()
+            # # Rosetta file to do the mutation
+            # resfile=open("{}/ncaa_resfile".format(self.path),"w")
+            # resfile.write("NATRO\n")
+            # resfile.write("start\n\n")
+            # resfile.write("{} {} EMPTY\n".format(position,self.binder))
+            # resfile.write("{} {} NC {}".format(position,self.binder,new_aa))
+            # resfile.close()
 
             resfile=open("{}/ncaa_resfile".format(self.path),"w")
             resfile.write('NATRO\n')
@@ -380,9 +445,9 @@ class complex:
             resfile.write('{} {} PIKAA X[{}]'.format(position,self.binder,new_aa))
             resfile.close()
 
-            ncaa = open("{}/list_ncaa".format(self.path),"w")
-            ncaa.write('{}'.format(new_aa))
-            ncaa.close()
+            # ncaa = open("{}/list_ncaa".format(self.path),"w")
+            # ncaa.write('{}'.format(new_aa))
+            # ncaa.close()
 
             os.system("cp {}/complexP/complex_{}.pdb {}".format(self.path,last_good_iteration,self.path))
 
@@ -391,18 +456,37 @@ class complex:
             #rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
 
             # Do the mutation
-            os.system("{}/main/source/bin/fixbb.linuxgccrelease -s {}/complex_{}.pdb \
-                      -use_input_sc -nstruct 1 -ex1 -ex2 -extrachi_cutoff 0 -overwrite -extra_res_fa src/params/{}.params \
-                      -minimize_sidechains -resfile {}/ncaa_resfile -packer_palette:extra_base_type_file {}/list_ncaa \
-                      -out:path:all {}".format(self.rosetta_path,self.path,last_good_iteration,new_aa,self.path,self.path,self.path))
+            if new_aa in self.internal_aa:
+                os.system("{}/main/source/bin/fixbb.static.linuxgccrelease -s {}/complex_{}.pdb \
+                          -use_input_sc -nstruct 1 -ex1 -ex2 -extrachi_cutoff 0 -overwrite \
+                          -minimize_sidechains -resfile {}/ncaa_resfile \
+                          -out:path:all {}".format(self.rosetta_path,self.path,last_good_iteration,self.path,self.path))
+
+
+            else:
+                os.system("{}/main/source/bin/fixbb.static.linuxgccrelease -s {}/complex_{}.pdb \
+                                                          -use_input_sc -nstruct 1 -ex1 -ex2 -extrachi_cutoff 0 -overwrite \
+                                                          -minimize_sidechains -resfile {}/ncaa_resfile -packer_palette:extra_base_type_file src/list_ncaa \
+                                                          -out:path:all {}".format(self.rosetta_path, self.path,
+                                                                                   last_good_iteration, self.path, self.path))
 
             # Relax the generated structure
-            os.system("{}/main/source/bin/relax.linuxgccrelease -database {}/main/database \
-                      -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {} \
-                      -relax:bb_move false".format(self.rosetta_path,self.rosetta_path,self.path,last_good_iteration,self.path))
+            os.system("{}/main/source/bin/relax.static.linuxgccrelease -database {}/main/database \
+                                                          -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {} \
+                                                          -relax:bb_move false".format(self.rosetta_path,
+                                                                                       self.rosetta_path, self.path,
+                                                                                       last_good_iteration, self.path))
+                # # Relax the generated structure
+                # os.system("{}/main/source/bin/relax.static.linuxgccrelease -database {}/main/database \
+                #                           -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {} -extra_res_fa src/params/{}.params \
+                #                           -relax:bb_move false".format(self.rosetta_path, self.rosetta_path, self.path,
+                #                                                        last_good_iteration, self.path, new_aa))
 
+            bash = "grep pose {}/complex_{}_0001_0001.pdb | awk '{{print $NF}}'".format(self.path,last_good_iteration)
+            ros_score = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
             os.system("csplit {}/complex_{}_0001_0001.pdb /All/".format(self.path,last_good_iteration))
             os.system("mv xx00 {}/mutated.pdb".format(self.path,self.path))
+            os.system("echo 'pose {}' >> {}/mutated.pdb".format(ros_score,self.path))
             os.system("rm {}/complex_{}* xx* {}/score.sc".format(self.path,last_good_iteration,self.path))
 
             mutation_document.write("Attempt mutation {}-{}{}-{}\n".format(old_aa,self.binder,position,new_aa))
@@ -416,7 +500,10 @@ class complex:
 
              # Calculate the score
             print("Scoring the new complex ...")
-            mutated_system.score_complex(score_list)
+            if mutated_system.flag_sampling==1:
+                mutated_system.score_complex(score_list, initial=True)
+            if mutated_system.flag_sampling==0:
+                mutated_system.score_complex(score_list)
 
             # After running the protocol, write the mutation in a document
             score_sentence=""
@@ -546,16 +633,16 @@ class complex:
         # Apply the the rank-by-vote consensus approach
         counter_threshold=0
 
-        if sc1_new-sc1_old < 0.0: counter_threshold+=1
-        if sc2_new-sc2_old < 0.0: counter_threshold+=1
+        if sc1_new-sc1_old <= 0.0: counter_threshold+=1
+        if sc2_new-sc2_old <= 0.0: counter_threshold+=1
         if len(score_list)>2:
-            if sc3_new-sc3_old < 0.0: counter_threshold+=1
+            if sc3_new-sc3_old <= 0.0: counter_threshold+=1
         if len(score_list)>3:
-            if sc4_new-sc4_old < 0.0: counter_threshold+=1
+            if sc4_new-sc4_old <= 0.0: counter_threshold+=1
         if len(score_list)>4:
-            if sc5_new-sc5_old < 0.0: counter_threshold+=1
+            if sc5_new-sc5_old <= 0.0: counter_threshold+=1
         if len(score_list)>5:
-            if sc6_new-sc6_old < 0.0: counter_threshold+=1
+            if sc6_new-sc6_old <= 0.0: counter_threshold+=1
 
         # Acceptance flag
         acceptance=0
