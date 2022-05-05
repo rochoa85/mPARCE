@@ -144,7 +144,7 @@ If you implement this protocol and publish the results, these references to exte
 - AutoDock Vina: Trott, O.; Olson, A. J. J. Comput. Chem., 2009, 31, 455–461.
 - Cyscore: Cao, Y.; Dai, W.; Miao, Z. Methods Mol. Biol., 2018, 1762, 233–243.
 - NNScore:  Durrant,  J.  D.;  McCammon,  J.  A., J. Chem. Inf. Model, 2011, 51, 2897–2903.
-- DLigand2: XXX
+- DLigand2: Chen, Y.; Ke, Y.; Lu, Y. et. al. J. Cheminformatics, 2019, 11, 8.
 - Smina: Koes, D.; Baumgartner M.; Camacho C. J. Chem. Inf. Model, 2013, 53, 8, 1893–1904.
 
 ## Support
