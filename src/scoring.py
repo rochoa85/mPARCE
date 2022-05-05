@@ -10,8 +10,8 @@ Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 Third-party tools required:
 
 - Rosetta - https://www.rosettacommons.org/software/license-and-download - The path should be provided in the configuration file
-- BioPython: https://biopython.org/wiki/Download - Ubuntu package: python3-rdkit
-- OpenBabel: https://sourceforge.net/projects/openbabel/ - Ubuntu package: openbabel
+- BioPython: https://biopython.org/wiki/Download
+- OpenBabel: https://sourceforge.net/projects/openbabel/
 """
 
 ########################################################################################
@@ -192,25 +192,6 @@ class score_protein_protein:
         else:
             self.dsxscore_score="%0.3f" %float(output)
 
-        #path_target=self.path+"/"+self.pdbID
-        #os.system("python {}/get_chains.py {}.pdb {}".format(self.path_scores,path_target,self.path))
-        # Create dynamically the target with the corresponding chains
-        #if len(self.chain_target) > 1:
-        #    structures_to_join=""
-        #    for chain in self.chain_target:
-        #        structures_to_join="{} {}_{}.pdb".format(structures_to_join,path_target,chain)
-        #    os.system("cat {} | grep -v END > {}_target.pdb".format(structures_to_join,path_target))
-        #else:
-        #    os.system("cp {}_{}.pdb {}_target.pdb".format(path_target,self.chain_target[0],path_target))
-
-        #os.system("obabel -ipdb {}_target.pdb -omol2 > {}_target.mol2".format(path_target,path_target))
-        #os.system("./{}/dsx_linux_64.lnx -L {}_{}.pdb -P {}_target.mol2 -D {}/pdb_pot_0511 -F {}/score.log".format(self.path_scores,path_target,self.chain_binder,path_target,self.path_scores,self.path))
-
-        # Filter the DSXscore file result
-        #bash="sed '/^$/d' {}/score.log | tail -n1 | awk '{{print $7}}'".format(self.path)
-        #output = subprocess.check_output(['bash','-c', bash])
-        #self.dsxscore_score="%0.3f" %float(output)
-
     ####################################################################
     def computeCyscore(self):
         """
@@ -239,43 +220,6 @@ class score_protein_protein:
         output = subprocess.check_output(['bash','-c', bash])
         os.system("rm {}/score.log {}/*.mol2 {}_*.pdb {}/chains.seq".format(self.path,self.path,path_target,self.path))
         self.cyscore_score="%0.3f" %float(output)
-
-####################################################################
-    def computeBPSscore(self):
-        """
-        Function to calculate BPSscore based on calls to the system programs.
-
-        Output:
-        bpsscore_score -- Score predicted by BPSscore
-        """
-
-        path_target=self.path+"/"+self.pdbID
-        os.system("python {}/get_chains.py {}.pdb {}".format(self.path_scores,path_target,self.path))
-        # Create dynamically the target with the corresponding chains
-        if len(self.chain_target) > 1:
-            structures_to_join=""
-            for chain in self.chain_target:
-                structures_to_join="{} {}_{}.pdb".format(structures_to_join,path_target,chain)
-            os.system("cat {} | grep -v END | grep ATOM > {}_target.pdb".format(structures_to_join,self.pdbID))
-        else:
-            os.system("grep ATOM {}_{}.pdb > {}_target.pdb".format(path_target,self.chain_target[0],self.pdbID))
-
-        os.system("obabel -ipdb {}_{}.pdb -omol2 > {}_{}.mol2".format(path_target,self.chain_binder,self.pdbID,self.chain_binder))
-        os.system("cp {}/energy.in .".format(self.path_scores))
-        os.system("sed -i 's#PATH#{}#g' energy.in".format(self.path_scores))
-        os.system("sed -i 's/RECEPTOR/{}_target/g' energy.in".format(self.pdbID))
-        os.system("sed -i 's/LIGAND/{}_{}/g' energy.in".format(self.pdbID,self.chain_binder))
-        os.system("./{}/energy energy.in > {}/score.log".format(self.path_scores,self.path))
-
-        # Filter the Cyscore file result
-        bash="grep 'Total_E' {}/score.log | awk '{{print $4}}'".format(self.path)
-        output = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
-        if "***" in output:
-            print("Problem with total energy. Use HB")
-            bash="grep 'hbond(intra)' {}/score.log | awk '{{print $4}}'".format(self.path)
-            output = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
-        #os.system("rm {}/score.log *.mol2 {}_*.pdb {}_*.pdb {}/chains.seq energy.in box.pdb".format(self.path,self.pdbID,path_target,self.path))
-        self.bpsscore_score="%0.3f" %float(output)
 
     ####################################################################
     def computeRosetta(self):

@@ -10,8 +10,8 @@ Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 Third-party tools required:
 
 - Rosetta - https://www.rosettacommons.org/software/license-and-download - The path should be provided in the configuration file
-- BioPython: https://biopython.org/wiki/Download - Ubuntu package: python3-rdkit
-- OpenBabel: https://sourceforge.net/projects/openbabel/ - Ubuntu package: openbabel
+- BioPython: https://biopython.org/wiki/Download
+- OpenBabel: https://sourceforge.net/projects/openbabel/
 """
 
 ########################################################################################
@@ -163,10 +163,6 @@ class complex:
         - Files derived from the sampling
         """
 
-        # Get rosetta path
-        #bash = "locate -b {} | head -n1".format(self.rosetta_version)
-        #self.rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
-
         if initial:
             # Run the sampling
             os.system("{}/main/source/bin/backrub.static.linuxgccrelease -database {}/main/database \
@@ -182,23 +178,13 @@ class complex:
 
 
         else:
-            # Run the sampling
-            #os.system("{}/main/source/bin/backrub.static.linuxgccrelease -database {}/main/database \
-            #              -s {}/mutated.pdb -ex1 -ex2 -extrachi_cutoff 0 -backrub:ntrials {} -mc_kt 1.2 -ignore_zero_occupancy=false \
-            #              -initial_pack -trajectory=true".format(self.rosetta_path,self.rosetta_path,self.path,self.trials))
-            #if os.path.isfile('ROSETTA_CRASH.log'):
+            # Convert the file names
             os.system("cp {}/mutated.pdb mutated_0001_last.pdb".format(self.path))
-            #os.system("sed -i '1s#^#MODEL\n#' {}/mutated.pdb".format(self.path))
             os.system("echo 'MODEL' | cat - {}/mutated.pdb > temp && mv temp mutated_0001_traj.pdb".format(self.path))
             os.system("echo 'ENDMDL' >> mutated_0001_traj.pdb")
-            #os.system("cp {}/mutated.pdb mutated_0001_traj.pdb".format(self.path))
             bash = "grep pose mutated_0001_traj.pdb | awk '{print $NF}'"
             self.score_current = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
             self.flag_sampling = 0
-            #else:
-            #    bash = "grep Score: mutated_0001_traj.pdb | awk '{print $NF}' | sort -g | head -n 1"
-            #    self.score_current = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
-            #    self.flag_sampling = 1
 
             # Store files
             os.system("mv mutated_0001_last.pdb {}/complex_{}.pdb".format(self.path,self.iteration))
@@ -280,13 +266,7 @@ class complex:
                     os.system("sed -i 's/OC1/O  /g' "+self.path+"/model" + str(model_number) + ".pdb")
                     os.system("sed -i 's/OC2/OXT/g' "+self.path+"/model" + str(model_number) + ".pdb")
 
-                    # if initial:
-                    #     bash="grep Score "+self.path+"/model" + str(model_number) + ".pdb | awk '{print $NF}'"
-                    #     ros_score = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
-                    # else:
-                    #     bash = "grep pose " + self.path + "/model" + str(model_number) + ".pdb | awk '{print $NF}'"
-                    #     ros_score = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")
-
+                    # Get current score
                     ros_score=self.score_current
 
                     # Function to score
@@ -336,12 +316,6 @@ class complex:
                             try:
                                 sc.computeCyscore()
                                 total_score[s].append(float(sc.cyscore_score))
-                            except:
-                                total_score[s].append(0.0)
-                        if s=="bpsscore":
-                            try:
-                                sc.computeBPSscore()
-                                total_score[s].append(float(sc.bpsscore_score))
                             except:
                                 total_score[s].append(0.0)
 
@@ -431,29 +405,13 @@ class complex:
             pep_single_mutation_2='-'.join(temporal_pep)
             print(pep_single_mutation_1,pep_single_mutation_2,old_aa,new_aa,position,self.binder)
 
-            # # Rosetta file to do the mutation
-            # resfile=open("{}/ncaa_resfile".format(self.path),"w")
-            # resfile.write("NATRO\n")
-            # resfile.write("start\n\n")
-            # resfile.write("{} {} EMPTY\n".format(position,self.binder))
-            # resfile.write("{} {} NC {}".format(position,self.binder,new_aa))
-            # resfile.close()
-
             resfile=open("{}/ncaa_resfile".format(self.path),"w")
             resfile.write('NATRO\n')
             resfile.write('start\n')
             resfile.write('{} {} PIKAA X[{}]'.format(position,self.binder,new_aa))
             resfile.close()
 
-            # ncaa = open("{}/list_ncaa".format(self.path),"w")
-            # ncaa.write('{}'.format(new_aa))
-            # ncaa.close()
-
             os.system("cp {}/complexP/complex_{}.pdb {}".format(self.path,last_good_iteration,self.path))
-
-            # Get rosetta path
-            #bash = "locate -b {} | head -n1".format(self.rosetta_version)
-            #rosetta_path = subprocess.check_output(['bash','-c', bash]).strip().decode("utf-8")
 
             # Do the mutation
             if new_aa in self.internal_aa:
@@ -476,11 +434,6 @@ class complex:
                                                           -relax:bb_move false".format(self.rosetta_path,
                                                                                        self.rosetta_path, self.path,
                                                                                        last_good_iteration, self.path))
-                # # Relax the generated structure
-                # os.system("{}/main/source/bin/relax.static.linuxgccrelease -database {}/main/database \
-                #                           -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {} -extra_res_fa src/params/{}.params \
-                #                           -relax:bb_move false".format(self.rosetta_path, self.rosetta_path, self.path,
-                #                                                        last_good_iteration, self.path, new_aa))
 
             bash = "grep pose {}/complex_{}_0001_0001.pdb | awk '{{print $NF}}'".format(self.path,last_good_iteration)
             ros_score = subprocess.check_output(['bash', '-c', bash]).strip().decode("utf-8")

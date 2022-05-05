@@ -125,18 +125,9 @@ We also included a folder called `auxiliar` with the following:
 
 **1. Parameterization of new NNAAs**
 
-The goal of the script `parameterize_NNAA.py` is to parameterize non-natural amino acids to be included within the Rosetta installation. The script requires of auxiliary programs and Unix system commands, including Rosetta, BioPython, OpenBabel, and the rdkit-to-params packages (*more details in the script*). The script has multiple options, including:
+The goal of the script `parameterize_NNAA.py` is to parameterize non-natural amino acids to be included within the Rosetta installation. The script requires of auxiliary programs and Unix system commands, including pyRosetta, BioPython, RDKit, OpenBabel, and the rdkit-to-params packages (*more details in the script*). The script requires a file called `list_NNAA.txt` with two columns, one having the PDB code of the NNAA and a second with the SMILES. **NOTE: The SMILES require of adding \* symbols after the N and C terminal atoms. An example is provided in the auxiliar folder.**
 
-MODIFY
-
-- m (mode): Choose a mode to run the script from four options: 1) full, 2) model, 3) params, and 4) rotlib. Full are the modelling, generation of parameters and rotamer libraries together.
-- n (nnaa): PDB code of the non-natural amino acid.
-- c (chain): Chain of the peptidomimetic containing the nnaa.
-- s (structure): PDB structure that contains the NNAA that will be parameterized.
-- t (tripeptide): PDB structure of the NNNA in the tripeptide form to start the parameterization.
-- r (rosetta): Version of Rosetta that will be implemented.
-
-At the end, a parameters file and a rotamer library file will be created, and can be incorporated into the Rosetta path.
+At the end, a parameters file will be created that can be incorporated into the Rosetta path.
 
 **2. Rosetta files of the included non-natural_amino acids**
 

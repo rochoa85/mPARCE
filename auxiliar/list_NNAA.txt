@@ -1,0 +1,10 @@
+KCR	C\C=C\C(=O)NCCCC[C@H](N*)C(*)=O
+66D	CC[C@@H](C)C[C@](C)(N*)C(*)=O
+73C	CCCCOC[C@H](N*)C(*)=O
+CG6	C[C@@H](S)[C@H](N*)C(*)=O
+5GM	CC[C@H](C)C[C@](C)(N*)C(*)=O
+5OL	CC(O)(O)NCCCC[C@H](N*)C(*)=O
+XOK	CC[C@H](S)CCCCC(=O)NCCCC[C@H](N*)C(*)=O
+TS9	C[C@@H](O)[C@@](C)(O)[C@H](N*)C(*)=O
+4FO	NCC[C@@H](N*)C(*)=O
+IIL	CC[C@@H](C)[C@H](N*)C(*)=O

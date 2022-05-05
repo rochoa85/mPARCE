@@ -10,8 +10,8 @@ Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 Third-party tools required:
 
 - Rosetta - https://www.rosettacommons.org/software/license-and-download - The path should be provided in the configuration file
-- BioPython: https://biopython.org/wiki/Download - Ubuntu package: python3-rdkit
-- OpenBabel: https://sourceforge.net/projects/openbabel/ - Ubuntu package: openbabel
+- BioPython: https://biopython.org/wiki/Download
+- OpenBabel: https://sourceforge.net/projects/openbabel/
 """
 
 ########################################################################################
@@ -122,7 +122,7 @@ if __name__ == '__main__':
                 print("For consensus scoring minimum two scoring functions should be selected. Exiting ...")
                 exit()
             for s in score_list:
-                if s not in ("vina","smina","rosetta","nnscore","internal","dligand2","flex","cyscore","bpsscore"):
+                if s not in ("vina","smina","rosetta","nnscore","internal","dligand2","flex","cyscore"):
                     print("The scoring function {} is not available. Exiting ...".format(s))
                     exit()
     else:
