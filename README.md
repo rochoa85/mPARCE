@@ -111,7 +111,7 @@ When a design run starts, an initial folder is created with the required input f
 - **target**: Stores the target structure after each mutation attempt.
 - **iterations**: Stores the average scores calculated per each iteration.
 - **complexP**: Stores the target-peptide structure after each mutation attempt.
-- **trajectory**: Stores the backrub trajectory of the previous mutations in PDB format.
+- **trajectory**: Stores the trajectory or last frame of the previous mutations in PDB format.
 
 
 The design protocol results are summarized in the output file called `mutation_report.txt`, which contains details per mutation step like the type of mutation, the average scores, the binder sequence and if the mutation was accepted or not. Regarding the type of mutation, it is defined with the nomenclature: [old amino acid][binder chain][position][new amino acid]. **An example of a mutation is DGNB1OLT, which means that the NNAA DGN located in the position number 1 of the chain B is replaced by the NNAA OLT.**
@@ -131,7 +131,7 @@ At the end, a parameters file will be created that can be incorporated into the 
 
 **2. Rosetta files of the included non-natural_amino acids**
 
-The second component is the compressed file `for_rosetta.tar.gz`, which contain the parameters that should be included in the Rosetta installation paths. Specifically, the folders and files are:
+The second component are the files containing the parameters that should be included in the Rosetta installation paths. Specifically, the folders and files are:
 
 - pdb-ncaa: Folder with all the parameter files .params that should be located at: `<ROSETTA_PATH>/main/database/chemical/residue_type_sets/fa_standard/residue_types`
 - residue_types.txt: File with the definition of all the residues, including the new NNAA. The file should be located at: `<ROSETTA_PATH>/main/database/chemical/residue_type_sets/fa_standard`.
