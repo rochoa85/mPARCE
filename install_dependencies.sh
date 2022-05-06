@@ -1,19 +1,20 @@
 #!/bin/bash
 
-"""
-PARCEmime: Protocol for refinement of bound peptidomimetics
+#mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
+#
+#From publication: Protocol for iterative optimization of modified peptides bound to protein targets
+#Journal of Chemical Information and Modelling, 2022
+#Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
+#
+#Third-party tools required:
+#
+#- Rosetta - https://www.rosettacommons.org/software/license-and-download - The path should be provided in the configuration file
+#- BioPython: https://biopython.org/wiki/Download
+#- OpenBabel: https://sourceforge.net/projects/openbabel/
 
-From publication: Protocol for iterative design of peptidomimetics bound to protein targets
-Journal of Chemical Information and Modelling, 2021
-Authors: Rodrigo Ochoa, XXX, Pilar Cossio
-
-Additional third-party tool required:
-
-- Rosetta - https://www.rosettacommons.org/software/license-and-download - The path should be provided in the configuration file
-"""
 
 ########################################################################################
-# Ubuntu 16.04 tested commands
+# Ubuntu 20.04 tested commands
 ########################################################################################
 
 sudo apt-get update

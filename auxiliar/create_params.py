@@ -134,8 +134,13 @@ if __name__ == "__main__":
 
     ########################################################################
     # Variables to modify
-    rosetha_path="/<route>/rosetta.binary.linux.release-296"
+    rosetta_path="/home/ochoadeo/Downloads/rosetta.binary.linux.release-296"
+    #rosetta_path="/<route>/rosetta.binary.linux.release-296"
     listNNAA = [x.strip() for x in open("list_NNAA.txt")]
+
+    if "<route>" in rosetta_path:
+        print("Error. Please define the Rosetta path in the script. Exiting")
+        exit(1)
     ########################################################################
 
     # Iterate over the list of NNAAs
@@ -148,7 +153,7 @@ if __name__ == "__main__":
         p = Params.from_smiles('{}'.format(smiles), #Recognised as amino acid. Example:	CCCC[C@@H](C(=O)*)N*
                 name='{}'.format(nnaa))
         if p.is_aminoacid():
-            p.dump('{}.old'.format(nnaa))
+            #p.dump('{}.old'.format(nnaa))
 
             # add to pose
             pose = pyrosetta.Pose()
@@ -158,7 +163,7 @@ if __name__ == "__main__":
             pose.dump_pdb('tripeptide.pdb')
             os.system("sed -i 's/HETATM/ATOM  /g' tripeptide.pdb")
             # Call main function
-            generate_params(nnaa,rosetha_path,pdb)
+            generate_params(nnaa,rosetta_path,pdb)
             os.system("rm tripeptide.pdb")
 
     # Generate the report of successful parameterization
