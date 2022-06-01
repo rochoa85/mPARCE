@@ -1,4 +1,4 @@
-folder: granzymeH_cat_2
+folder: granzymeH_cat
 mode: start
 pdbID: granzymeH
 peptide: PRO-THR-SER-TYR-ALA-GLY-ASP-ASP-SER 
@@ -11,5 +11,5 @@ teffective: 4
 num_mutations: 100
 residues_mod: 2,4,6,8
 source: ./input
-rosetta_version: /home/ochoadeo/Downloads/rosetta.binary.linux.release-296
+rosetta_version: ~/rosetta.binary.linux.release-296
 categories: NEUTRAL,HYDROPHOBIC,MEDIUM

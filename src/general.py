@@ -430,8 +430,7 @@ class complex:
 
             # Relax the generated structure
             os.system("{}/main/source/bin/relax.static.linuxgccrelease -database {}/main/database \
-                                                          -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {} \
-                                                          -relax:bb_move false".format(self.rosetta_path,
+                                                          -in:file:s {}/complex_{}_0001.pdb -relax:thorough -out:path:all {}".format(self.rosetta_path,
                                                                                        self.rosetta_path, self.path,
                                                                                        last_good_iteration, self.path))
 
