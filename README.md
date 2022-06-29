@@ -3,7 +3,7 @@
 ## mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
 
 * From publication: Protocol for iterative optimization of modified peptides bound to protein targets
-* Journal of Chemical Information and Modelling, 2022
+* Journal of Computer-Aided Molecular Design, 2022
 * Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
 
 
@@ -95,7 +95,7 @@ teffective: 4
 num_mutations: 100
 residues_mod: 2,4,6,8
 source: ./input
-rosetta_version: /<route>/rosetta.binary.linux.release-296
+rosetta_version: <UPDATE_ROSETTA_PATH>
 categories: NEUTRAL,HYDROPHOBIC,MEDIUM
 ```
 **NOTE: The 'categories' variable is optional, and the 'route' input in the 'rosetta_version' variable can be updated depending on the local installation.**
