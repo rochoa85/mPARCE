@@ -11,4 +11,4 @@ teffective: 4
 num_mutations: 100
 residues_mod: 2,4,6,8
 source: ./input
-rosetta_version: ~/rosetta.binary.linux.release-296
+rosetta_version: <UPDATE_ROSETTA_PATH>
