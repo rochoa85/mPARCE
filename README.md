@@ -9,15 +9,15 @@
 
 ## Purpose
 
-Here we present mPARCE, an open source protocol to design modified peptides with improved binding affinity to a target of reference. The protocol generates single point mutations on the peptide sequence based on a list of parameterized non-natural amino acids (NNAAs). Then, it estimates their binding affinities in complex with the protein in an efficient but accurate manner by combining backrub sampling from Rosetta with a consensus metric using multiple protein-ligand scoring functions.
+Here, we present mPARCE, an open source protocol to design modified peptides with improved binding affinity to a target of reference. The protocol generates single-point mutations on the peptide sequence based on a list of parameterized non-natural amino acids (NNAAs). Then, it estimates their binding affinities in complex with the protein in an efficient but accurate manner by combining backrub sampling from Rosetta with a consensus metric using multiple protein-ligand scoring functions.
 
 ## Required third-party tools:
 
 - Rosetta (tested with 2022 version): https://www.rosettacommons.org/software/license-and-download
 
-**NOTE: The name of the local Rosetta folder path must be provided in the configuration file. Rosetta is required to do the mutation and complex sampling.**
+**NOTE: The name of the local Rosetta folder path must be provided in the configuration file. Rosetta is required to perform the mutation and conformational sampling.**
 
-- The scoring functions (Vina, DLigand2, NNscore, Cyscore, RosettaScore, Smina) are provided in the **src** folder and configured to run the analysis. **NOTE: In the case of the scripts extracted from MGLTools (http://mgltools.scripps.edu/downloads), we recommend to install them from source and update the scripts: pythonsh, prepare_receptor4.py and prepare_ligand4.py in the src/scores folder from mPARCE.**
+- The scoring functions (Vina, DLigand2, NNscore, Cyscore, RosettaScore, Smina) are provided in the **src** folder and configured to run the analysis. **NOTE: In the case of scripts extracted from MGLTools (http://mgltools.scripps.edu/downloads), we recommend to install them from source and update the scripts: pythonsh, prepare_receptor4.py and prepare_ligand4.py in the src/scores folder from mPARCE.**
 
 ## Dependencies:
 The BioPython and additional python modules (minimum python3.5) can be installed directly from the OS repositories. An example in Ubuntu 20.04 is:
@@ -31,7 +31,7 @@ sudo apt-get install python3-tk
 sudo apt-get install python3-yaml
 ```
 
-**NOTE: They can be installed using Conda. In addition, a `install_dependencies.sh` file is provided to automatize the installation of dependencies in the Linux (Ubuntu) operating system.**
+**NOTE: They can be installed using Conda. In addition, a `install_dependencies.sh` file is provided to automatize the installation of the dependencies in the Linux (Ubuntu) operating system.**
 
 ## Input files required
 
@@ -54,7 +54,7 @@ arguments:
                   protocol
  ```
 
-The configuration file describes all the parameters required to run the protocol. A full detailed explanation is provided in the next section.
+The configuration file describes the parameters required to run the protocol. A full detailed explanation is provided in the next section.
 
 ## Configuration file
 
@@ -119,7 +119,7 @@ The design protocol results are summarized in the output file called `mutation_r
 
 ## Analysis of the results and auxiliar files and scripts
 
-With the final `mutation_report.txt`, it is possible to check and select the accepted sequences, and plot the scores to verify that they are minimizing after the mutation steps. The results are numbered per iteration step, and the folder's content facilitates locating the information. Examples of the analysis are provided in the original manuscript.
+With the final `mutation_report.txt`, it is possible to check and select the accepted sequences, and plot the scores to verify that they are minimizing after the mutation steps. The results are numbered per iteration step, and the folder's content facilitates locating the information. Examples of the analysis are provided in the manuscript.
 
 We also included a folder called `auxiliar` with the following:
 
@@ -149,4 +149,4 @@ If you implement this protocol and publish the results, these references to exte
 
 ## Support
 
-In case the protocol is useful for other research projects and require some advice, please contact us to the email: rodrigo.ochoa@udea.edu.co
+For inquiries, please contact: rodrigo.ochoa@udea.edu.co
