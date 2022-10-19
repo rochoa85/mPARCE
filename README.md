@@ -2,10 +2,9 @@
 
 ## mPARCE: Protocol for iterative optimization of modified peptides bound to protein targets
 
-* From publication: Protocol for iterative optimization of modified peptides bound to protein targets
+* If this protocol is used, please cite the following publication: Protocol for iterative optimization of modified peptides bound to protein targets. Link: https://link.springer.com/article/10.1007/s10822-022-00482-1.
 * Journal of Computer-Aided Molecular Design, 2022
 * Authors: Rodrigo Ochoa, Pilar Cossio, Thomas Fox
-
 
 ## Purpose
 
